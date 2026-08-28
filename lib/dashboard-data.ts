@@ -1,8 +1,4 @@
-/**
- * Em produção, estes dados viriam do banco de dados de acordo com o
- * usuário autenticado na sessão (ex.: consulta por session.userId).
- * Aqui usamos um mock apenas para demonstração da interface.
- */
+import { supabase } from './supabase'
 
 export type CurrentUser = {
   id: string
@@ -11,9 +7,8 @@ export type CurrentUser = {
   avatarUrl?: string
 }
 
-export function getCurrentUser(): CurrentUser {
-  // TODO: substituir por consulta real, ex.:
-  // const user = await db.query.users.findFirst({ where: eq(users.id, session.userId) })
+// Por enquanto mantemos a Marina fixa, conectaremos o login depois!
+export async function getCurrentUser(): Promise<CurrentUser> {
   return {
     id: "usr_001",
     name: "Marina Costa",
@@ -30,12 +25,20 @@ export type Stat = {
   trendUp: boolean
 }
 
-export function getSummaryStats(): Stat[] {
+export async function getSummaryStats(): Promise<Stat[]> {
+  // 1. O site "liga" para o Supabase e conta as linhas da tabela 'alunos'
+  const { count, error } = await supabase
+    .from('alunos')
+    .select('*', { count: 'exact', head: true })
+
+  // 2. Se a contagem der certo, usamos o número. Se der erro, mostramos "0"
+  const totalAlunos = count !== null ? count.toString() : "0"
+
   return [
     {
       key: "alunos",
       label: "Alunos Matriculados",
-      value: "342",
+      value: totalAlunos, // <--- A MÁGICA ACONTECE AQUI! Substituímos o 342.
       helper: "matriculados no programa",
       trend: "+12 este mês",
       trendUp: true,
