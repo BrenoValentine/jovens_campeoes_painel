@@ -34,7 +34,7 @@ export function getSummaryStats(): Stat[] {
   return [
     {
       key: "alunos",
-      label: "Total de Alunos",
+      label: "Alunos Matriculados",
       value: "342",
       helper: "matriculados no programa",
       trend: "+12 este mês",
