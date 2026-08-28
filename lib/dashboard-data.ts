@@ -7,7 +7,6 @@ export type CurrentUser = {
   avatarUrl?: string
 }
 
-// Por enquanto mantemos a Marina fixa, conectaremos o login depois!
 export async function getCurrentUser(): Promise<CurrentUser> {
   return {
     id: "usr_001",
@@ -26,20 +25,27 @@ export type Stat = {
 }
 
 export async function getSummaryStats(): Promise<Stat[]> {
-  // 1. O site "liga" para o Supabase e conta as linhas da tabela 'alunos'
   const { count, error } = await supabase
     .from('alunos')
     .select('*', { count: 'exact', head: true })
 
-  // 2. Se a contagem der certo, usamos o número. Se der erro, mostramos "0"
-  const totalAlunos = count !== null ? count.toString() : "0"
+  let totalAlunos = "0"
+  let helperText = "matriculados no programa"
+
+  // Se o Supabase reclamar de algo, vamos jogar o erro na tela!
+  if (error) {
+    totalAlunos = "Erro"
+    helperText = error.message
+  } else if (count !== null) {
+    totalAlunos = count.toString()
+  }
 
   return [
     {
       key: "alunos",
       label: "Alunos Matriculados",
-      value: totalAlunos, // <--- A MÁGICA ACONTECE AQUI! Substituímos o 342.
-      helper: "matriculados no programa",
+      value: totalAlunos,
+      helper: helperText, // <-- A pista do erro vai aparecer aqui
       trend: "+12 este mês",
       trendUp: true,
     },
