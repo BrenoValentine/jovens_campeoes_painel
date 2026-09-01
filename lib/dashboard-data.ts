@@ -28,6 +28,7 @@ export async function getSummaryStats(): Promise<Stat[]> {
   const { count, error } = await supabase
     .from('alunos')
     .select('*', { count: 'exact', head: true })
+    console.log("🔌 TESTE DO FIO SUPABASE:", { contagem: count, erro: error })
 
   let totalAlunos = "0"
   let helperText = "matriculados no programa"
