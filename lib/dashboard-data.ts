@@ -25,20 +25,20 @@ export type Stat = {
 }
 
 export async function getSummaryStats(): Promise<Stat[]> {
-  const { count, error } = await supabase
+  // Puxa os dados reais em vez de pedir a contagem invisível
+  const { data, error } = await supabase
     .from('alunos')
-    .select('*', { count: 'exact', head: true })
-    console.log("🔌 TESTE DO FIO SUPABASE:", { contagem: count, erro: error })
+    .select('*')
 
   let totalAlunos = "0"
   let helperText = "matriculados no programa"
 
-  // Se o Supabase reclamar de algo, vamos jogar o erro na tela!
   if (error) {
     totalAlunos = "Erro"
     helperText = error.message
-  } else if (count !== null) {
-    totalAlunos = count.toString()
+  } else if (data) {
+    // O painel conta a quantidade exata de registros que chegaram
+    totalAlunos = data.length.toString()
   }
 
   return [
@@ -46,7 +46,7 @@ export async function getSummaryStats(): Promise<Stat[]> {
       key: "alunos",
       label: "Alunos Matriculados",
       value: totalAlunos,
-      helper: helperText, // <-- A pista do erro vai aparecer aqui
+      helper: helperText,
       trend: "+12 este mês",
       trendUp: true,
     },
